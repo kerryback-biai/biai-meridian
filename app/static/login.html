@@ -27,7 +27,10 @@
                 </div>
                 <div class="mb-3">
                     <label for="password" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="password" required>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="password" required>
+                        <button class="btn btn-outline-secondary" type="button" id="toggle-pw" tabindex="-1">Show</button>
+                    </div>
                 </div>
                 <button type="submit" class="btn btn-primary w-100" id="submit-btn">Sign In</button>
             </form>
@@ -38,6 +41,13 @@
         if (localStorage.getItem('token')) {
             window.location.href = '/index.html';
         }
+
+        document.getElementById('toggle-pw').addEventListener('click', function() {
+            const pw = document.getElementById('password');
+            const show = pw.type === 'password';
+            pw.type = show ? 'text' : 'password';
+            this.textContent = show ? 'Hide' : 'Show';
+        });
 
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();

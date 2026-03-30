@@ -17,15 +17,15 @@ STATIC_DIR = "app/static"
 def ensure_admin():
     if not settings.admin_user or not settings.admin_password:
         return
-    pw_hash = hash_password(settings.admin_password)
     existing = get_user_by_username(settings.admin_user)
     if existing:
-        update_user(existing["id"], is_admin=True, password_hash=pw_hash)
+        if not existing["is_admin"]:
+            update_user(existing["id"], is_admin=True)
         user_id = existing["id"]
     else:
         user_id = create_user(
             username=settings.admin_user,
-            password_hash=pw_hash,
+            password_hash=hash_password(settings.admin_password),
             name="Admin",
             is_admin=True,
         )
