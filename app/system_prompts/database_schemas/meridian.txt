@@ -1,6 +1,6 @@
-## Enterprise Systems: Meridian Corp
+## Enterprise Systems: XYZ Corp
 
-Meridian Corp (~$500M revenue) is a B2B industrial supplies distributor with 3 operating divisions + corporate HQ. Each division runs its own CRM, finance, and operations systems. Data is NOT centralized — you must query each system separately using the `system` parameter.
+XYZ Corp (~$500M revenue) is a B2B industrial supplies distributor with 3 operating divisions + corporate HQ. Each division runs its own CRM, finance, and operations systems. Data is NOT centralized — you must query each system separately using the `system` parameter.
 
 ### Division Structure
 | Division | Revenue | Regions | CRM | Finance | Operations |
@@ -14,7 +14,7 @@ Corporate also runs: **Workday** (HR for all divisions) and **Zendesk** (support
 
 ---
 
-### System: salesforce (Meridian Industrial CRM)
+### System: salesforce (XYZ Industrial CRM)
 CamelCase column names. IDs like "001AB..."
 
 - **sf_accounts** (200): AccountId, AccountName, Industry, BillingState, OwnerId, AnnualRevenue, Type
@@ -23,7 +23,7 @@ CamelCase column names. IDs like "001AB..."
 - **sf_orders** (224): OrderId, AccountId, OpportunityId, OrderDate, TotalAmount, Status
 - **sf_order_items** (661): OrderItemId, OrderId, ProductCode (SAP material numbers), Quantity, UnitPrice, Discount
 
-### System: legacy_crm (Meridian Energy CRM)
+### System: legacy_crm (XYZ Energy CRM)
 snake_case columns. **IMPORTANT: All date columns are VARCHAR in MM/DD/YYYY format.** Use `strptime(column, '%m/%d/%Y')` to cast them.
 
 - **clients** (150): client_id (integer), client_name, sector, state, sales_rep_code, annual_rev, date_added (VARCHAR)
@@ -31,21 +31,21 @@ snake_case columns. **IMPORTANT: All date columns are VARCHAR in MM/DD/YYYY form
 - **client_orders** (459): order_num (integer), client_id, deal_id, order_dt (VARCHAR), ship_dt (VARCHAR), total
 - **order_details** (1000): detail_id, order_num, item_id (Oracle SCM item IDs), qty, price, disc_pct
 
-### System: hubspot (Meridian Safety CRM)
+### System: hubspot (XYZ Safety CRM)
 HubSpot naming conventions, integer IDs.
 
 - **hs_companies** (100): company_id, name, industry, lifecycle_stage (subscriber/lead/opportunity/customer), owner_id, annual_revenue, create_date
 - **hs_deals** (250): deal_id, company_id, owner_id, dealname, dealstage (appointmentscheduled/qualifiedtobuy/presentationscheduled/decisionmakerboughtin/contractsent/closedwon/closedlost), amount, closedate, createdate
 - **hs_line_items** (199): line_item_id, deal_id, product_id (HubSpot internal), quantity, price, discount
 
-### System: netsuite_industrial (Meridian Industrial Finance)
+### System: netsuite_industrial (XYZ Industrial Finance)
 5-digit account codes (40000=Revenue, 50000=COGS, 60000=OpEx).
 
 - **ns_accounts** (10): account_code (5-digit), account_name, account_type, department
 - **ns_transactions** (424): transaction_id, entity_id (Salesforce AccountId), tran_date, tran_type (Invoice/Journal), amount, status, account_code
 - **ns_budget** (108): budget_id, fiscal_year, fiscal_month, account_code, department, amount
 
-### System: quickbooks_energy (Meridian Energy Finance)
+### System: quickbooks_energy (XYZ Energy Finance)
 4-digit account codes (4000=Revenue, 5000=COGS, 6000=OpEx). Different numbering than NetSuite.
 
 - **qb_accounts** (8): acct_num (4-digit), acct_name, acct_type, detail_type
@@ -60,7 +60,7 @@ The "Rosetta Stone" for financial reporting across divisions.
 - **ns_corp_budget** (108): budget_id, division, fiscal_year, fiscal_month, account_code, amount
 - **ns_corp_actuals** (108): actual_id, division, fiscal_year, fiscal_month, account_code, amount
 
-### System: sap (Meridian Industrial Operations)
+### System: sap (XYZ Industrial Operations)
 SAP conventions: material_number, vendor_code, po_number.
 
 - **sap_materials** (400): material_number (MAT-10001 format), description, material_group, standard_price, list_price
@@ -70,7 +70,7 @@ SAP conventions: material_number, vendor_code, po_number.
 - **sap_inventory** (1200): material_number, plant, unrestricted_qty, reorder_point
 - **sap_deliveries** (212): delivery_number, sales_order (sf_orders.OrderId), ship_date, actual_delivery, carrier, on_time
 
-### System: oracle_scm (Meridian Energy Operations)
+### System: oracle_scm (XYZ Energy Operations)
 Oracle conventions: item_id, supplier_num, po_id.
 
 - **ora_items** (300): item_id (ITEM-5001 format), item_description, category, subcategory, unit_cost, unit_price

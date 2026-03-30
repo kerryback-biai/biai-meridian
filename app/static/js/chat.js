@@ -65,7 +65,7 @@ logoutBtn.addEventListener('click', () => {
 function showWelcome() {
     messagesEl.innerHTML = `
         <div class="welcome">
-            <h2>Meridian Corp Data Assistant</h2>
+            <h2>XYZ Corp Data Assistant</h2>
             <p>Query across 10 enterprise systems spanning 3 operating divisions. Ask questions in plain English — I'll pull data from the right systems and merge it for you.</p>
             <div class="db-overview">
                 <div class="row g-3 mt-3">
