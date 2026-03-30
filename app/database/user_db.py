@@ -153,7 +153,7 @@ def list_users() -> list[dict]:
 
 
 def update_user(user_id: int, **kwargs) -> None:
-    user_fields = {"name", "is_active", "is_admin"}
+    user_fields = {"name", "is_active", "is_admin", "password_hash"}
     access_fields = {"spending_limit_cents"}
 
     user_updates = {k: v for k, v in kwargs.items() if k in user_fields}
