@@ -129,7 +129,9 @@ def grant_app_access(user_id: int, app_name: str,
             cur.execute(
                 """INSERT INTO app_access (user_id, app_name, spending_limit_cents, vm_password)
                    VALUES (%s, %s, %s, %s)
-                   ON CONFLICT (user_id, app_name) DO NOTHING""",
+                   ON CONFLICT (user_id, app_name) DO UPDATE SET
+                       spending_limit_cents = COALESCE(EXCLUDED.spending_limit_cents, app_access.spending_limit_cents),
+                       vm_password = COALESCE(EXCLUDED.vm_password, app_access.vm_password)""",
                 (user_id, app_name, limit, vm_password)
             )
 
