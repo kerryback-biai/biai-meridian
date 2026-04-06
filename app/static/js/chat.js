@@ -60,7 +60,7 @@ logoutBtn.addEventListener('click', () => {
 function showWelcome() {
     messagesEl.innerHTML = `
         <div class="welcome">
-            <p class="mt-3">Query across 10 enterprise systems spanning 3 operating divisions. Ask questions in plain English — I'll pull data from the right systems and merge it for you.</p>
+            <p class="mt-3">Query across 10 synthetic enterprise systems spanning 3 operating divisions. Ask questions in plain English — I'll pull data from the right systems and merge it for you.</p>
             <div class="db-overview">
                 <div class="row g-3 mt-3">
                     <div class="col-md-6">
