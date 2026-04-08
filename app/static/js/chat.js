@@ -60,9 +60,14 @@ logoutBtn.addEventListener('click', () => {
 function showWelcome() {
     messagesEl.innerHTML = `
         <div class="welcome">
-            <p class="mt-3">Query across 10 synthetic enterprise systems spanning 3 operating divisions. Ask questions in plain English — I'll pull data from the right systems and merge it for you.</p>
-            <div class="db-overview">
-                <div class="row g-3 mt-3">
+            <p class="mt-3">I'm the XYZ Corp Custom Chatbot. Ask me anything &mdash; general questions, business topics, or data queries across our enterprise systems.</p>
+            <p class="mt-2">
+                <button class="btn btn-sm btn-outline-secondary" type="button" id="toggle-systems">
+                    View data systems
+                </button>
+            </p>
+            <div class="db-overview" id="systems-detail" style="display:none;">
+                <div class="row g-3 mt-1">
                     <div class="col-md-6">
                         <div class="card h-100"><div class="card-body">
                             <h6 class="card-title">Industrial Division <span class="text-muted small">(~$250M)</span></h6>
@@ -103,6 +108,12 @@ function showWelcome() {
             </div>
         </div>
     `;
+    document.getElementById('toggle-systems').addEventListener('click', function() {
+        const detail = document.getElementById('systems-detail');
+        const visible = detail.style.display !== 'none';
+        detail.style.display = visible ? 'none' : 'block';
+        this.textContent = visible ? 'View data systems' : 'Hide data systems';
+    });
 }
 
 async function sendMessage() {

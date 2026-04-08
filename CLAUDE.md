@@ -1,6 +1,6 @@
 # XYZ Corp Data Simulation
 
-AI data analyst chat app for a fictional B2B industrial supplies distributor (~$500M revenue, 3 divisions). Users ask questions in plain English; the app queries enterprise systems via DuckDB on bundled Parquet files and responds with data, visualizations, and documents.
+Custom AI chatbot for a fictional B2B industrial supplies distributor (~$500M revenue, 3 divisions). Users can ask general questions, hold conversations on any topic, or query enterprise data systems. The app uses DuckDB on bundled Parquet files for data queries and responds with text, visualizations, and documents.
 
 ## Stack
 
