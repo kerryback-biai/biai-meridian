@@ -14,8 +14,22 @@ from app.chat.rag import search_documents
 MODEL = "claude-sonnet-4-20250514"
 MAX_TOKENS = 8192
 MAX_TOOL_ROUNDS = 12
+MAX_HISTORY_CHARS = 100_000  # Trim history if it exceeds this
 
 PROMPTS_DIR = Path(__file__).parent.parent / "system_prompts"
+
+
+def _trim_history(history: list[dict]) -> list[dict]:
+    """Keep only the most recent messages that fit within MAX_HISTORY_CHARS."""
+    total = 0
+    cutoff = len(history)
+    for i in range(len(history) - 1, -1, -1):
+        size = len(json.dumps(history[i], default=str))
+        total += size
+        if total > MAX_HISTORY_CHARS:
+            cutoff = i + 1
+            break
+    return list(history[cutoff:])
 
 
 def load_system_prompt() -> str:
@@ -24,23 +38,36 @@ def load_system_prompt() -> str:
     return f"{base}\n\n{schema}"
 
 
-def _execute_tool(name: str, tool_input: dict) -> str:
+def _execute_tool(name: str, tool_input: dict) -> tuple[str, dict]:
+    """Execute a tool and return (result_for_claude, raw_result).
+
+    result_for_claude has large payloads (base64 charts) stripped to stay
+    within the Claude context window.  raw_result is the unmodified dict
+    so callers can still stream images/files to the user.
+    """
     if name == "query_database":
         result = execute_query(tool_input["sql"], tool_input.get("system", "salesforce"))
-        return json.dumps(result, default=str)
-    if name == "run_python":
-        result = execute_python(tool_input["code"])
-        return json.dumps(result, default=str)
-    if name == "run_node":
-        result = execute_node(tool_input["code"])
-        return json.dumps(result, default=str)
+        return json.dumps(result, default=str), result
+    if name in ("run_python", "run_node"):
+        if name == "run_python":
+            result = execute_python(tool_input["code"])
+        else:
+            result = execute_node(tool_input["code"])
+        # Strip base64 charts from the version sent back to Claude
+        # (they're already streamed to the user separately)
+        claude_result = {
+            **result,
+            "charts": [f"<chart {i+1} displayed to user>" for i in range(len(result.get("charts", [])))],
+        }
+        return json.dumps(claude_result, default=str), result
     if name == "read_skill_docs":
         result = read_skill_docs(tool_input["skill"])
-        return json.dumps(result, default=str)
+        return json.dumps(result, default=str), result
     if name == "search_documents":
         result = search_documents(tool_input["query"])
-        return json.dumps(result, default=str)
-    return json.dumps({"error": f"Unknown tool: {name}"})
+        return json.dumps(result, default=str), result
+    err = json.dumps({"error": f"Unknown tool: {name}"})
+    return err, {}
 
 
 # Tools that produce files and charts
@@ -65,7 +92,7 @@ def _run_agent_sync(
     system_prompt = load_system_prompt()
     tools = get_tools()
 
-    messages = list(history)
+    messages = _trim_history(history)
     messages.append({"role": "user", "content": message})
 
     total_input_tokens = 0
@@ -111,14 +138,13 @@ def _run_agent_sync(
                         yield sse_tool_status(_TOOL_STATUS[block.name])
 
                     # Execute the tool
-                    result_str = _execute_tool(block.name, block.input)
+                    result_str, raw_result = _execute_tool(block.name, block.input)
 
                     # For code tools, emit charts and file links
                     if block.name in _CODE_TOOLS:
-                        result_data = json.loads(result_str)
-                        for chart_b64 in result_data.get("charts", []):
+                        for chart_b64 in raw_result.get("charts", []):
                             yield sse_image(chart_b64)
-                        for file_info in result_data.get("files", []):
+                        for file_info in raw_result.get("files", []):
                             yield sse_file(file_info["filename"], file_info["url"])
 
                     tool_results.append({
